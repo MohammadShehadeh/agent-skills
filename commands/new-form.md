@@ -5,7 +5,7 @@ argument-hint: <form-name> [fields / purpose]
 
 Build a form: $ARGUMENTS
 
-Load the `px-form` skill (and `px-conventions` for errors/hooks when wiring submit). Work through phases 1–3 as the plan — no markup before confirmation.
+Load the `agent-skills-form` skill (and `agent-skills-conventions` for errors/hooks when wiring submit). Work through phases 1–3 as the plan — no markup before confirmation.
 
 ## 1. Decide — form library or not
 
@@ -24,7 +24,7 @@ Load the `px-form` skill (and `px-conventions` for errors/hooks when wiring subm
 
 ## 3. Controls & layout
 
-- Pick controls from the chooser in `px-form` → `references/forms.md`.
+- Pick controls from the chooser in `agent-skills-form` → `references/forms.md`.
 - Plan `FieldGroup` / `Field` / `FieldSet` structure — no raw `div` + `space-y-*`.
 - `'use client'` on the form component leaf only.
 

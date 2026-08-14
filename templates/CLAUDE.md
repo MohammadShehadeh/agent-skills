@@ -1,17 +1,17 @@
 <!--
 Copy this into a project root as CLAUDE.md.
 
-Preferred setup: install the px-* skills (plugin install, or copy skills/* into
+Preferred setup: install the agent-skills-* skills (plugin install, or copy skills/* into
 .claude/skills/) — they load the full rules on demand, keeping this file tiny.
 
-Fallback (no skills): copy skills/px-conventions/references/ into the repo as
+Fallback (no skills): copy skills/agent-skills-conventions/references/ into the repo as
 rules/ and uncomment the @-imports below. This injects ~800 lines into every
 session — prefer the skills.
 -->
 
 # Code Conventions
 
-House conventions ship as the `px-conventions` skill (with `px-debug`, `px-nextjs-page`, `px-feature`, `px-form`, `px-service` for their workflows). Follow them for all TypeScript/React/Next.js code in this repo.
+House conventions ship as the `agent-skills-conventions` skill (with `agent-skills-debug`, `agent-skills-nextjs-page`, `agent-skills-feature`, `agent-skills-form`, `agent-skills-service` for their workflows). Follow them for all TypeScript/React/Next.js code in this repo.
 
 **Adapt to this repo** — match existing layout, aliases, UI layer, and toolchain before adding new patterns. The skills describe house style, not a mandate to restructure unrelated code.
 

@@ -1,4 +1,4 @@
-<!-- Copy of skills/px-conventions/references/services.md so this skill installs standalone — keep in sync. -->
+<!-- Copy of skills/agent-skills-conventions/references/services.md so this skill installs standalone — keep in sync. -->
 
 # Services & Boundaries
 
@@ -142,7 +142,7 @@ export const fetchInvoice = async (id: string): Promise<Result<Invoice, InvoiceE
 - **Validate the response, don't just cast it.** `response.json()` is typed `T` by assertion, not proof — an owned API still drifts. Past a handful of endpoints, `schema.safeParse(res.data)` in the service before mapping; the client stays generic. It is JSON-only by design — blob / CSV / SSE responses get their own path.
 - **Writes that may fire around page exit** pass `keepalive: true` — flushing a debounced save, "mark as read", analytics. Body is capped (~64 KiB), response is fire-and-forget — never for reads.
 
-For shaping the data a service returns — parsing, formatting, search, and pagination — see the `px-conventions` skill: `data` rule.
+For shaping the data a service returns — parsing, formatting, search, and pagination — see the `agent-skills-conventions` skill: `data` rule.
 
 ## Separate decisions from actions
 

@@ -1,12 +1,12 @@
-# px
+# agent-skills
 
-Coding conventions packaged for Claude Code — self-contained `px-*` skills, thin commands, and a reviewer agent, extracted from real production TypeScript/React/Next.js codebases.
+Coding conventions packaged for Claude Code — self-contained `agent-skills-*` skills, thin commands, and a reviewer agent, extracted from real production TypeScript/React/Next.js codebases.
 
 ## What's inside
 
 ```text
 skills/       Self-contained skills — each installs standalone into any repo
-  px-conventions/
+  agent-skills-conventions/
     SKILL.md             Condensed cheat sheet of the house style — triggers on any TS/React work
     references/          The full rules, one topic per file:
       core-principles      How to work: adapt to the repo, plan by discovering shared layers at scale, be concise, simplest code that works
@@ -27,11 +27,11 @@ skills/       Self-contained skills — each installs standalone into any repo
       structure            Feature modules (colocated default), optional packages, no barrels
       testing              Colocated tests on pure logic, match repo toolchain
       review-checklist     Canonical review list — shared by the command and the agent
-  px-debug/              Localize top-down, trace references to the root cause (where/why/how for wrong-value bugs), check blast radius
-  px-nextjs-page/        Build a page/landing section the house way (+ references/nextjs.md)
-  px-feature/            Scaffold a feature module — colocated by default, package when shared (+ references/structure.md)
-  px-form/               Build a form — schema first, RHF + zod, Field markup, Result submit (+ references/forms.md)
-  px-service/            Scaffold a service boundary — DTO map, Result, ErrorKey (+ references/services.md, errors.md)
+  agent-skills-debug/              Localize top-down, trace references to the root cause (where/why/how for wrong-value bugs), check blast radius
+  agent-skills-nextjs-page/        Build a page/landing section the house way (+ references/nextjs.md)
+  agent-skills-feature/            Scaffold a feature module — colocated by default, package when shared (+ references/structure.md)
+  agent-skills-form/               Build a form — schema first, RHF + zod, Field markup, Result submit (+ references/forms.md)
+  agent-skills-service/            Scaffold a service boundary — DTO map, Result, ErrorKey (+ references/services.md, errors.md)
 
 commands/     Slash commands over the skills
   /plan-task             Restate task as verifiable targets, confirm before coding
@@ -53,31 +53,31 @@ templates/    Slim CLAUDE.md template for projects (skills carry the rules; @-im
 
 ### Naming scheme
 
-- **Skills** are `px-` + noun (`px-conventions`, `px-debug`) — collision-proof when installed standalone, self-contained with their own `references/`.
+- **Skills** are `agent-skills-` + noun (`agent-skills-conventions`, `agent-skills-debug`) — collision-proof when installed standalone, self-contained with their own `references/`.
 - **Commands** are verb-first imperatives (`/new-component`, `/review-conventions`). They lean on the skills for the rules; `/new-feature` additionally carries the end-to-end build workflow.
-- **One word per concept**: "conventions" (plural) and "review" everywhere — skill `px-conventions`, command `/review-conventions`, agent `conventions-reviewer`, reference `review-checklist.md`.
-- `px-nextjs-page`, `px-feature`, `px-form`, and `px-service` carry copies of the rule files they need so they install alone; each copy is marked with a keep-in-sync note pointing at the original in `px-conventions/references/`. A copy's prose and cross-skill links may differ from the canonical, but its code blocks must not — `scripts/check-doc-sync.mjs` (run in CI via `.github/workflows/doc-sync.yml`) fails the build if any copy's fenced code drifts from its source.
+- **One word per concept**: "conventions" (plural) and "review" everywhere — skill `agent-skills-conventions`, command `/review-conventions`, agent `conventions-reviewer`, reference `review-checklist.md`.
+- `agent-skills-nextjs-page`, `agent-skills-feature`, `agent-skills-form`, and `agent-skills-service` carry copies of the rule files they need so they install alone; each copy is marked with a keep-in-sync note pointing at the original in `agent-skills-conventions/references/`. A copy's prose and cross-skill links may differ from the canonical, but its code blocks must not — `scripts/check-doc-sync.mjs` (run in CI via `.github/workflows/doc-sync.yml`) fails the build if any copy's fenced code drifts from its source.
 
 ## Install
 
 **As a plugin** (everything at once — skills, commands, agent):
 
 ```text
-/plugin marketplace add MohammadShehadeh/px
-/plugin install px
+/plugin marketplace add MohammadShehadeh/agent-skills
+/plugin install agent-skills
 ```
 
 **Skills only, anywhere** — each skill directory is self-contained (Agent Skills format). Copy any of them into `~/.claude/skills/` (personal) or a repo's `.claude/skills/` (per project):
 
 ```text
-skills/px-conventions/     →  .claude/skills/px-conventions/
-skills/px-debug/           →  .claude/skills/px-debug/
+skills/agent-skills-conventions/     →  .claude/skills/agent-skills-conventions/
+skills/agent-skills-debug/           →  .claude/skills/agent-skills-debug/
 ...
 ```
 
-**Commands & agent** require the plugin install — they resolve the checklist via `${CLAUDE_PLUGIN_ROOT}`. If you copy them out instead, replace that variable with the real path to `skills/px-conventions/`.
+**Commands & agent** require the plugin install — they resolve the checklist via `${CLAUDE_PLUGIN_ROOT}`. If you copy them out instead, replace that variable with the real path to `skills/agent-skills-conventions/`.
 
-**Per project (no skills at all)** — copy `skills/px-conventions/references/` into the repo as `rules/` and use `templates/CLAUDE.md` with its fallback @-imports uncommented.
+**Per project (no skills at all)** — copy `skills/agent-skills-conventions/references/` into the repo as `rules/` and use `templates/CLAUDE.md` with its fallback @-imports uncommented.
 
 ## The style in one paragraph
 

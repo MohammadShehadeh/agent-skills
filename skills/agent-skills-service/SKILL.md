@@ -1,11 +1,11 @@
 ---
-name: px-service
+name: agent-skills-service
 description: Scaffold a service or server boundary the house way — one shared http client, zod-validated payloads, DTO mapping, narrowed Result with ErrorKey, no throws to UI. Use when adding API clients, server actions, route handlers, or external integrations.
 ---
 
 # Service & Boundary
 
-How to wrap external chaos behind a typed boundary. Full rules in [references/services.md](references/services.md) and [references/errors.md](references/errors.md). Load `px-conventions` for naming, structure, and testing.
+How to wrap external chaos behind a typed boundary. Full rules in [references/services.md](references/services.md) and [references/errors.md](references/errors.md). Load `agent-skills-conventions` for naming, structure, and testing.
 
 ## 1. Inspect the repo
 

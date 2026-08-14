@@ -1,16 +1,16 @@
 {
-  "name": "px",
+  "name": "agent-skills",
   "owner": {
     "name": "Mohammad Shehadeh"
   },
   "metadata": {
-    "description": "House TypeScript/React/Next.js conventions as self-contained px-* skills, commands, and a conventions-reviewer agent."
+    "description": "House TypeScript/React/Next.js conventions as self-contained agent-skills-* skills, commands, and a conventions-reviewer agent."
   },
   "plugins": [
     {
-      "name": "px",
+      "name": "agent-skills",
       "source": "./",
-      "description": "House coding conventions: self-contained px-* skills, commands, and a conventions-reviewer agent"
+      "description": "House coding conventions: self-contained agent-skills-* skills, commands, and a conventions-reviewer agent"
     }
   ]
 }

@@ -1,11 +1,11 @@
 ---
-name: px-form
+name: agent-skills-form
 description: Build a form the house way — zod schema first, react-hook-form logic, shadcn Field/FieldGroup markup, control chooser, submit via Result-returning action/service. Use when creating or extending forms, validation, or form submit flows.
 ---
 
 # Form
 
-End-to-end form recipe. Markup and control rules in [references/forms.md](references/forms.md). Load `px-conventions` for errors, components, and hooks-state when wiring submit.
+End-to-end form recipe. Markup and control rules in [references/forms.md](references/forms.md). Load `agent-skills-conventions` for errors, components, and hooks-state when wiring submit.
 
 ## 1. Decide — form library or not
 
@@ -21,7 +21,7 @@ Inspect the repo: reuse an existing form pattern, schema location, and submit ho
 - Export a **zod schema** colocated with the feature (`lib/` or next to the form component).
 - Derive the form type: `type CheckoutFormValues = z.infer<typeof checkoutSchema>`.
 - List **validation failures** (field-level, from zod) and **submit failures** (server/network) separately.
-- Submit failures use SCREAMING_SNAKE `ErrorKey` literals — add them to the feature's `constants/error-keys.ts` before wiring submit (`px-conventions`: `errors` rule).
+- Submit failures use SCREAMING_SNAKE `ErrorKey` literals — add them to the feature's `constants/error-keys.ts` before wiring submit (`agent-skills-conventions`: `errors` rule).
 
 **Present the schema, field list, and error keys** — confirm before building UI.
 

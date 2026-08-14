@@ -1,5 +1,5 @@
 ---
-name: px-conventions
+name: agent-skills-conventions
 description: House TypeScript/React coding conventions. Use whenever writing or reviewing TypeScript, React, or Next.js code — components, hooks, services, types, styling — so output matches the house style.
 ---
 

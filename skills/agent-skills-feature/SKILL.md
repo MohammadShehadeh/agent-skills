@@ -1,11 +1,11 @@
 ---
-name: px-feature
+name: agent-skills-feature
 description: Scaffold or extend a feature module — colocated route/feature folder by default, optional shared package when multi-consumer. Use when creating a new feature or adding an area (hooks, actions, services) to an existing one.
 ---
 
 # Feature Module
 
-How a feature is structured and where it lives. Full detail in this skill's [references/structure.md](references/structure.md). Load `px-conventions` for everything inside the module (components, hooks, boundaries, errors).
+How a feature is structured and where it lives. Full detail in this skill's [references/structure.md](references/structure.md). Load `agent-skills-conventions` for everything inside the module (components, hooks, boundaries, errors).
 
 ## 1. Pick the feature's home
 
@@ -66,7 +66,7 @@ Follow the repo's package naming, build output paths, and workspace dependency c
 ## 5. Patterns inside the module
 
 - Compose the project's shared UI layer — never redefine base primitives.
-- User-facing copy via the project's i18n (or an exhaustive key→string map); failures as SCREAMING_SNAKE `ErrorKey` literals from `constants/error-keys.ts` (`px-conventions`: `errors` rule).
+- User-facing copy via the project's i18n (or an exhaustive key→string map); failures as SCREAMING_SNAKE `ErrorKey` literals from `constants/error-keys.ts` (`agent-skills-conventions`: `errors` rule).
 - Extensible systems (3+ variants): registry pattern — definitions → Map registry → factory → renderer. Two cases: lookup map or `switch`.
 - Cross-cutting API checks: higher-order wrappers (`export const POST = withAuth(handleCreateOrder)`) when the repo already uses that pattern.
-- Everything else per `px-conventions`.
+- Everything else per `agent-skills-conventions`.
