@@ -14,13 +14,15 @@ const StatusBadge = ({ icon: Icon }: { icon: React.ComponentType }) => <Icon />;
 <StatusBadge icon={CheckIcon} />
 ```
 
-- **No sizing classes on icons inside components** — `Button`, `DropdownMenuItem`, `Alert`, etc. size their icons via CSS. No `size-4`, no `mr-2`:
+- **No sizing or spacing classes on icons inside components that already size their own** — `Button`, `DropdownMenuItem`, `Alert`, etc. size (`[&_svg]:size-4`) and space (`gap-2`) direct icon children via CSS. Drop the icon in bare; don't add `size-4` or `mr-2`:
 
 ```tsx
-// Bad
+// Bad — fighting styles the component already applies
 <Button><SearchIcon className="mr-2 size-4" /> Search</Button>
 
-// Good — position with data-icon, sizing is the component's job
-<Button><SearchIcon data-icon="inline-start" /> Search</Button>
-<Button>Next <ArrowRightIcon data-icon="inline-end" /></Button>
+// Good — bare child; the component sizes it, its gap spaces it
+<Button><SearchIcon /> Search</Button>
+<Button>Next <ArrowRightIcon /></Button>
 ```
+
+Sizing classes are correct when the icon stands alone (`<CheckIcon className="size-5 text-primary" />`) — outside a component that manages its own icons, you own the size.

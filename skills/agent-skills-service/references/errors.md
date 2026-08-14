@@ -1,4 +1,4 @@
-<!-- Copy of skills/px-conventions/references/errors.md so this skill installs standalone — keep in sync. -->
+<!-- Copy of skills/agent-skills-conventions/references/errors.md so this skill installs standalone — keep in sync. -->
 
 # Error Handling
 
@@ -63,7 +63,7 @@ Two mappings every service needs, defined once in `lib/error-keys.ts`, never inl
 // HTTP status → shared keys, operation key as fallback — 401/404/429 never collapse into the catch-all.
 // K is `extends string`, never the app-wide ErrorKey union, so this shared helper (and the http client
 // built on it) stays a generic utility a packaged feature can call with its own keys.
-export const toErrorKey = <K extends string>(response: Response, fallback: K, notFound?: K): SharedErrorKey | K => {
+export const errorKeyFromResponse = <K extends string>(response: Response, fallback: K, notFound?: K): SharedErrorKey | K => {
   if (response.status === 401) return 'UNAUTHORIZED';
   if (response.status === 404 && notFound) return notFound;
   if (response.status === 429) return 'RATE_LIMITED';
@@ -72,7 +72,7 @@ export const toErrorKey = <K extends string>(response: Response, fallback: K, no
 
 // thrown fetch errors → TIMEOUT vs NETWORK — "took too long, try again" and "check your
 // connection" are different instructions to the user
-export const toCaughtErrorKey = (error: unknown): SharedErrorKey =>
+export const errorKeyFromException = (error: unknown): SharedErrorKey =>
   error instanceof DOMException && error.name === 'TimeoutError' ? 'TIMEOUT' : 'NETWORK';
 ```
 
@@ -82,7 +82,7 @@ Validate invariants at the top and throw/return early; avoid `else`:
 
 ```ts
 if (!portalUrl) throw new Error('portalUrl is required');
-if (!response.ok) return { ok: false, errorKey: toErrorKey(response, 'INVOICE_FETCH_FAILED') };
+if (!response.ok) return { ok: false, errorKey: errorKeyFromResponse(response, 'INVOICE_FETCH_FAILED') };
 ```
 
 Two failure kinds, two channels: **invariant violations** (programmer error — throw with a dev-facing message, like the `portalUrl` guard; it never reaches the UI) vs **expected failures** (user-visible — return `{ ok: false, errorKey }`). Keys are only for the second kind.
@@ -95,11 +95,11 @@ Log with the `'Error in <fn>::'` prefix so failures are greppable, then return t
 export const fetchInvoice = async (id: string): Promise<Result<Invoice, InvoiceErrorKey>> => {
   try {
     const response = await fetch(`${env.API_BASE_URL}/invoices/${id}`, { signal: AbortSignal.timeout(10_000) });
-    if (!response.ok) return { ok: false, errorKey: toErrorKey(response, 'INVOICE_FETCH_FAILED', 'INVOICE_NOT_FOUND') };
-    return { ok: true, data: toInvoice(await response.json()) };
+    if (!response.ok) return { ok: false, errorKey: errorKeyFromResponse(response, 'INVOICE_FETCH_FAILED', 'INVOICE_NOT_FOUND') };
+    return { ok: true, data: parseInvoice(await response.json()) };
   } catch (error) {
     console.error('Error in fetchInvoice::', error);
-    return { ok: false, errorKey: toCaughtErrorKey(error) };
+    return { ok: false, errorKey: errorKeyFromException(error) };
   }
 };
 ```
@@ -113,7 +113,7 @@ For `fetch` calls this whole shape lives **once** in the shared `http` client, n
 ```ts
 } catch (error) {
   console.error('Error in submitOrder::', error instanceof Error ? error.message : error);
-  setState({ status: 'error', errorKey: toCaughtErrorKey(error) });
+  setState({ status: 'error', errorKey: errorKeyFromException(error) });
 }
 ```
 

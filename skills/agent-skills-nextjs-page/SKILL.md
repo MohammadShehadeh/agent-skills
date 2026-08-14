@@ -1,11 +1,11 @@
 ---
-name: px-nextjs-page
+name: agent-skills-nextjs-page
 description: Build a Next.js App Router page/landing section the house way — thin server page composing section components, leaf-level client boundaries, metadata via title template and factories. Use when creating pages, landing sections, or route groups.
 ---
 
 # Next.js Page
 
-Full detail in this skill's [references/nextjs.md](references/nextjs.md). Load `px-conventions` for component, styling, and boundary rules. **Match the repo's** layout wrappers, routes config location, and path aliases.
+Full detail in this skill's [references/nextjs.md](references/nextjs.md). Load `agent-skills-conventions` for component, styling, and boundary rules. **Match the repo's** layout wrappers, routes config location, and path aliases.
 
 ## Recipe
 

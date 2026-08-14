@@ -5,7 +5,7 @@ argument-hint: <form-name> [fields / purpose]
 
 Build a form: $ARGUMENTS
 
-Load the `px-form` skill (and `px-conventions` for errors/hooks when wiring submit). Work through phases 1–3 as the plan — no markup before confirmation.
+Load the `agent-skills-form` skill (and `agent-skills-conventions` for errors/hooks when wiring submit). Work through phases 1–3 as the plan — no markup before confirmation.
 
 ## 1. Decide — form library or not
 
@@ -24,14 +24,14 @@ Load the `px-form` skill (and `px-conventions` for errors/hooks when wiring subm
 
 ## 3. Controls & layout
 
-- Pick controls from the chooser in `px-form` → `references/forms.md`.
+- Pick controls from the chooser in `agent-skills-form` → `references/forms.md`.
 - Plan `FieldGroup` / `Field` / `FieldSet` structure — no raw `div` + `space-y-*`.
 - `'use client'` on the form component leaf only.
 
 ## 4. Build
 
 - **Markup**: shadcn Field primitives; `data-invalid` + `aria-invalid` together; `InputGroup` for buttons-in-inputs.
-- **Logic**: `useForm` + `zodResolver`, `mode: 'onChange'`; double-submit guard via async hook or `isSubmitting`.
+- **Logic**: `useForm` + `zodResolver`, validation `mode` chosen deliberately (`onTouched` default, `onChange` only when a field needs per-keystroke feedback); double-submit guard via async hook or `isSubmitting`.
 - **Submit**: call service/action returning `Result<T, K>`; surface `{ ok: false, errorKey }` via toast or root error — never hardcoded strings.
 - **Files**: kebab-case, colocated with feature; schema in `lib/`; no barrel `index.ts`.
 

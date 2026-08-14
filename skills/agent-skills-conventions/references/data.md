@@ -8,7 +8,7 @@ The DTO mapper (see [services.md](services.md)) is the **only** place a wire val
 
 ```ts
 // inside the service — parse here, once
-const toItem = (dto: ItemDto): Item => ({
+const parseItem = (dto: ItemDto): Item => ({
   id: dto.id,
   amount: Number(dto.amount_cents) / 100,
   createdAt: new Date(dto.created_at),        // a Date leaves the boundary, never a string
@@ -18,6 +18,11 @@ const toItem = (dto: ItemDto): Item => ({
 
 - A domain type holds **parsed** values (`Date`, `number`, unions) — never `createdAt: string` waiting to be `new Date()`-d at three call sites. Re-parsing after fetch is the disorganization this removes.
 - `Invalid Date` / `NaN` at a *read* site means the mapper was skipped — fix the boundary, not the reader.
+
+### Mapper conventions
+
+- **Name it for what it does — no `to` prefix.** Inbound, the mapper *parses* a wire DTO into a domain value: `parseInvoice`, `parseSubscription` — a reader knows the domain type from the call. Outbound, one that ships domain data back out as strings *formats* it: `formatRow`. `parseItem` is fine only while the type really is `Item`; if the name is vaguer than the shape it builds, rename one so the pair reads. A mapper stays a plain named function — no `Mapper` class, no factory or registry to hold a single transform; unnecessary encapsulation is just ceremony around a function.
+- **Annotate the DTO in, pin the domain type out, infer everything between.** Typing the parameter (`dto: ItemDto`) guards the untrusted input; the `: Item` return is deliberate — a forgotten or mistyped field errors *here* at the boundary instead of surfacing three call sites downstream. Inside the body, let inference do the rest; don't hand-write types TS already knows (see [typescript.md](typescript.md)).
 
 ## Format at the edge
 
@@ -42,13 +47,13 @@ One helper per format, reused everywhere; locale and currency come from config, 
 
 ```ts
 // lib/item-view.ts — pure, tested; each step composes, none mutate
-export const searchItems = (rows: Array<Item>, q: string): Array<Item> =>
+export const searchItems = (rows: Item[], q: string): Item[] =>
   q ? rows.filter((r) => r.label.toLowerCase().includes(q.toLowerCase())) : rows;
 
-export const sortItems = (rows: Array<Item>, by: SortKey): Array<Item> =>
+export const sortItems = (rows: Item[], by: SortKey): Item[] =>
   [...rows].sort(SORTERS[by]);                 // copy first: never sort the source array in place
 
-export const paginate = <T>(rows: Array<T>, page: number, size: number): Array<T> =>
+export const paginate = <T>(rows: T[], page: number, size: number): T[] =>
   rows.slice((page - 1) * size, page * size);
 ```
 
@@ -71,14 +76,14 @@ When the filtering/paging happens in **your** server layer — a route handler o
 ```ts
 // lib/list-view.ts — parse ONCE to domain types, then filter/sort/page on those
 interface ListQuery { from?: string; to?: string; status?: Status; page?: number; perPage?: number }
-interface ListView { entries: Array<Item>; total: number; totalPages: number }
+interface ListView { entries: Item[]; total: number; totalPages: number }
 
 export const buildListView = (
   { from, to, status, page = 1, perPage = 12 }: ListQuery,
-  raw: Array<ItemDto>,
+  raw: ItemDto[],
 ): ListView => {
   const filtered = raw
-    .map(toItem)                                                  // DTO → domain: createdAt is a Date, amount a number
+    .map(parseItem)                                               // DTO → domain: createdAt is a Date, amount a number
     .filter((e) => !from || e.createdAt >= new Date(from))        // compare Dates …
     .filter((e) => !to || e.createdAt <= new Date(to))
     .filter((e) => !status || e.status === status)
@@ -92,11 +97,11 @@ export const buildListView = (
 };
 ```
 
-- **Parse to domain types first, format last.** `createdAt` stays a `Date` so the filter and sort compare `Date`s. Storing `formatDate(createdAt)` on the entry and then `new Date()`-ing that display string back to filter is the format-then-re-parse trap the first rule warns against — and formatted strings don't reliably round-trip. Format in the view, or in a final `.map(toRow)` if the server must ship strings.
+- **Parse to domain types first, format last.** `createdAt` stays a `Date` so the filter and sort compare `Date`s. Storing `formatDate(createdAt)` on the entry and then `new Date()`-ing that display string back to filter is the format-then-re-parse trap the first rule warns against — and formatted strings don't reliably round-trip. Format in the view, or in a final `.map(formatRow)` if the server must ship strings.
 - **Search params are not entity fields.** `from` / `status` / `page` live in the query type, never on `Item`. Don't hang a field on the domain shape just to filter, then strip it back off.
 - **A pure function, not a class.** It takes input and returns a result with no lifecycle; a class whose constructor computes everything and exposes fields is a function wearing ceremony. Reach for a class only when instances carry state or have methods called *after* construction (`view.nextPage()`, `view.toCsv()`).
 - Still **server-first**: this is for when the full set is already in hand (a BFF/route that fetched everything). If the origin API takes `?q=&page=`, let it page — don't fetch-all to slice in memory.
 
 ## What gets tested
 
-The pure functions — `toItem`, `buildQuery`, `searchItems`, `sortItems`, `paginate`, `buildListView` — get colocated `*.test.ts` (see [testing.md](testing.md)). The `useMemo` wiring does not; it holds no logic of its own.
+The pure functions — `parseItem`, `buildQuery`, `searchItems`, `sortItems`, `paginate`, `buildListView` — get colocated `*.test.ts` (see [testing.md](testing.md)). The `useMemo` wiring does not; it holds no logic of its own.

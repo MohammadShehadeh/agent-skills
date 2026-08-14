@@ -1,6 +1,6 @@
-# Privacy Policy — px
+# Privacy Policy — agent-skills
 
-**px collects no data.**
+**agent-skills collects no data.**
 
 This plugin consists entirely of static markdown files — skills, slash commands, and an agent definition. It contains no executable code, no hooks, no MCP servers, and makes no network requests.
 
@@ -8,4 +8,4 @@ This plugin consists entirely of static markdown files — skills, slash command
 - It does not read or send your code anywhere. All processing happens inside your own Claude Code session, governed by [Anthropic's privacy policy](https://www.anthropic.com/legal/privacy).
 - The plugin has no server-side component and no third-party services.
 
-Questions: open an issue at [github.com/MohammadShehadeh/px](https://github.com/MohammadShehadeh/px/issues).
+Questions: open an issue at [github.com/MohammadShehadeh/agent-skills](https://github.com/MohammadShehadeh/agent-skills/issues).
