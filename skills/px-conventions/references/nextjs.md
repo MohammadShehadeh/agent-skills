@@ -63,6 +63,6 @@ export const createPageMetadata = ({ title, description, path }: PageMetaConfig)
 
 ## Data & env
 
-- Static content lives in typed data modules (`Array<NavigationItem>` or equivalent); use `.tsx` data files when entries embed JSX/icons.
+- Static content lives in typed data modules (`NavigationItem[]` or equivalent); use `.tsx` data files when entries embed JSX/icons.
 - Env vars are typed and validated with zod (e.g. `@t3-oss/env-nextjs`, single `env.ts`) — never raw `process.env` reads scattered across files.
 - Use the project's path aliases (`@/*` or equivalent) — do not add a second alias scheme.

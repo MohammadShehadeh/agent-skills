@@ -11,7 +11,7 @@ skills/       Self-contained skills — each installs standalone into any repo
     references/          The full rules, one topic per file:
       core-principles      How to work: adapt to the repo, plan by discovering shared layers at scale, be concise, simplest code that works
       naming               kebab-case files, is/has/should booleans, handle*/on*, no barrels
-      typescript           interface vs type, status unions, derive-don't-restate, Array<T>
+      typescript           interface vs type, status unions, derive-don't-restate, inference-first
       components           Named arrow-const components, compound flat exports, flat trees
       hooks-state          Object-returning hooks, one status union, safe context
       forms                RHF + zod logic, Field/FieldGroup markup, control chooser

@@ -34,7 +34,7 @@ export const submitContactMessage = (
 
 ```ts
 // services/billing.ts — vendor snake_case never escapes this file
-const toSubscription = (dto: VendorSubscriptionDto): Subscription => ({
+const parseSubscription = (dto: VendorSubscriptionDto): Subscription => ({
   id: dto.subscription_id,
   status: dto.state === 'ACTIVE' ? 'active' : 'canceled',
   renewsAt: new Date(dto.next_billing_time),
@@ -60,13 +60,13 @@ export const POST = withAuth(handleCreateOrder); // auth + validation before del
 
 ## The shared HTTP client
 
-**One `fetch` wrapper; every service goes through it.** Base URL, default and auth headers, JSON encode/parse, the timeout, and the status/exception → `errorKey` mapping are written **once** in a `createHttp` factory — never re-typed per service. A service that repeats headers + `try/catch` + `AbortSignal.timeout` + `toErrorKey` is exactly the boilerplate this removes, and it multiplies by every endpoint in a large codebase.
+**One `fetch` wrapper; every service goes through it.** Base URL, default and auth headers, JSON encode/parse, the timeout, and the status/exception → `errorKey` mapping are written **once** in a `createHttp` factory — never re-typed per service. A service that repeats headers + `try/catch` + `AbortSignal.timeout` + `errorKeyFromResponse` is exactly the boilerplate this removes, and it multiplies by every endpoint in a large codebase.
 
 ```ts
 // lib/http.ts — a createHttp factory; the request logic is written once, instances are thin
 import type { Result } from '@/types/result';
 import type { SharedErrorKey } from '@/constants/error-keys';
-import { toCaughtErrorKey, toErrorKey } from '@/lib/error-keys';
+import { errorKeyFromException, errorKeyFromResponse } from '@/lib/error-keys';
 import { authHeaders } from '@/lib/auth-headers';
 import { env } from '@/lib/env';
 
@@ -99,11 +99,11 @@ export const createHttp = ({ baseUrl, headers }: HttpConfig) => {
         headers: { 'Content-Type': 'application/json', ...(await headers?.()), ...init.headers },
         signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
       });
-      if (!response.ok) return { ok: false, errorKey: toErrorKey(response, fallbackKey, notFoundKey) };
+      if (!response.ok) return { ok: false, errorKey: errorKeyFromResponse(response, fallbackKey, notFoundKey) };
       return { ok: true, data: response.status === 204 ? (null as T) : await response.json() };
     } catch (error) {
       console.error(`Error in http ${init.method ?? 'GET'} ${path}::`, error);
-      return { ok: false, errorKey: toCaughtErrorKey(error) };
+      return { ok: false, errorKey: errorKeyFromException(error) };
     }
   };
 
@@ -131,11 +131,11 @@ export const fetchInvoice = async (id: string): Promise<Result<Invoice, InvoiceE
     fallbackKey: 'INVOICE_FETCH_FAILED',
     notFoundKey: 'INVOICE_NOT_FOUND',
   });
-  return res.ok ? { ok: true, data: toInvoice(res.data) } : res;
+  return res.ok ? { ok: true, data: parseInvoice(res.data) } : res;
 };
 ```
 
-- **The timeout lives in the client**, so every call has one — a hung request becomes a caught `TimeoutError` that `toCaughtErrorKey` maps to `TIMEOUT` (vs `NETWORK` for a dead connection), never an infinite spinner. Pass `signal` for caller cancellation; it is combined with the timeout via `AbortSignal.any`.
+- **The timeout lives in the client**, so every call has one — a hung request becomes a caught `TimeoutError` that `errorKeyFromException` maps to `TIMEOUT` (vs `NETWORK` for a dead connection), never an infinite spinner. Pass `signal` for caller cancellation; it is combined with the timeout via `AbortSignal.any`.
 - **One instance per backend, from the `createHttp` factory** — a second base URL / auth scheme (a vendor vs your own API) is another exported instance, never an `if (vendor)` branch. A cross-cutting concern added in `createHttp` reaches every instance at once: tracing headers, structured logging (swap the `console.error`), rate-limit backoff, a token-refresh retry — retry idempotent methods only, never blind-retry a `POST`.
 - **Server and client resolve auth differently**, so `headers` is a thunk (and may be async): the server instance reads the request (`cookies()` / `headers()`), the client instance reads its token store. Build one instance per runtime rather than force a single module to be both.
 - **`K extends string`, not the app-wide `ErrorKey`** — the client is a generic utility that knows only `SharedErrorKey` (401/404/429); the operation's key comes from the caller and the *service's* declared `Result<T, FooErrorKey>` is what narrows it. A feature extracted to a package brings its own keys without the shared layer importing a global union.
@@ -146,4 +146,4 @@ For shaping the data a service returns — parsing, formatting, search, and pagi
 
 ## Separate decisions from actions
 
-Pure functions decide (`calculateDiscount`, `buildSearchQuery`, `toSubscription`); thin shells act (call the API, set state, show the toast). The pure part is what gets unit tests — no mocking I/O to test logic.
+Pure functions decide (`calculateDiscount`, `buildSearchQuery`, `parseSubscription`); thin shells act (call the API, set state, show the toast). The pure part is what gets unit tests — no mocking I/O to test logic.

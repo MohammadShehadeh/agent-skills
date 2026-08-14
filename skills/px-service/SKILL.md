@@ -13,7 +13,7 @@ Before creating files, find what already exists:
 
 - `Result<T, K>` type — reuse it; define once if missing (`types/result.ts`)
 - Shared `http` client (`lib/http.ts`) — reuse it; the service never calls `fetch` directly. Define once if missing (owns base URL, auth headers, JSON, timeout, status→`errorKey` mapping)
-- `toErrorKey` / `toCaughtErrorKey` helpers — reuse from `lib/error-keys.ts` (the client uses these; a raw-SDK service that can't go through `http` uses them directly)
+- `errorKeyFromResponse` / `errorKeyFromException` helpers — reuse from `lib/error-keys.ts` (the client uses these; a raw-SDK service that can't go through `http` uses them directly)
 - Typed `env.ts` — never read `process.env` in the service
 - Existing services in the same feature — match file location, naming, and how they call `http`
 
@@ -35,7 +35,7 @@ Add new keys to the feature's `constants/error-keys.ts`. Name **reason when know
 
 | Layer | Lives in | Tested |
 | --- | --- | --- |
-| Pure mapping / validation logic | `lib/` — `toInvoice`, `buildQuery` | Yes — colocated `*.test.ts` |
+| Pure mapping / validation logic | `lib/` — `parseInvoice`, `buildQuery` | Yes — colocated `*.test.ts` |
 | I/O shell | `services/` or `actions/` | Integration/manual; logic stays in `lib/` |
 
 Vendor DTO shapes never leave the service file — map to internal domain types inside.
@@ -61,7 +61,7 @@ export const fetchInvoice = async (id: string): Promise<Result<Invoice, InvoiceE
     fallbackKey: 'INVOICE_FETCH_FAILED',
     notFoundKey: 'INVOICE_NOT_FOUND',
   });
-  return res.ok ? { ok: true, data: toInvoice(res.data) } : res;
+  return res.ok ? { ok: true, data: parseInvoice(res.data) } : res;
 };
 ```
 
@@ -69,7 +69,7 @@ export const fetchInvoice = async (id: string): Promise<Result<Invoice, InvoiceE
 - **Timeout, auth headers, and status→`errorKey` mapping live in the client** — pass `signal` for caller cancellation, `notFoundKey` for a 404 reason key.
 - **Writes around tab close**: pass `keepalive: true` in the options on fire-and-forget flushes only — never on reads.
 - **Untrusted boundary**: `schema.safeParse(res.data)` in the service before mapping; the client stays generic.
-- A service that must call a **raw vendor SDK** (not HTTP) keeps its own `try/catch` with `toCaughtErrorKey` — the `http` client is for fetch.
+- A service that must call a **raw vendor SDK** (not HTTP) keeps its own `try/catch` with `errorKeyFromException` — the `http` client is for fetch.
 
 ## 5. Schema at the boundary
 
@@ -112,7 +112,7 @@ lib/contact-schema.ts         # zod + mappers — tested
 constants/error-keys.ts       # ContactErrorKey union
 types/result.ts               # shared Result (repo-level, once)
 lib/http.ts                   # shared fetch client (repo-level, once)
-lib/error-keys.ts             # toErrorKey, toCaughtErrorKey (repo-level, once)
+lib/error-keys.ts             # errorKeyFromResponse, errorKeyFromException (repo-level, once)
 ```
 
 Kebab-case filenames, named exports, no barrel `index.ts`.

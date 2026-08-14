@@ -77,6 +77,7 @@ const searchSchema = z.object({
 type SearchParams = z.infer<typeof searchSchema>; // never retyped by hand
 ```
 
+- **Prefer inference over annotation — write the type only where it's a contract.** Don't restate what TS already infers: an initialized `const`, a callback parameter typed by its caller, a function whose return is obvious from its body. Annotate the things that *pin a contract* — function parameters, exported/boundary signatures, the domain shape a DTO mapper returns (so a wrong field errors at the mapper, not downstream) — and the spots where inference widens wrong (`as const`, an empty-array seed). Fewer types written, checked exactly as hard.
 - `unknown` (never `any`) for open values: `Record<string, unknown>`. If `any` is truly unavoidable, disable the lint rule on that line with a comment saying why.
 - Write type guards for narrowing instead of casting:
 
@@ -90,7 +91,7 @@ const activeUsers = users.filter(isNotNull);
 
 ## Misc
 
-- `Array<T>` generic syntax over `T[]` (`Array<NavigationItem>`, `Array<string>`).
+- **Array syntax follows the repo.** `T[]` or `Array<T>` — match whatever the codebase already uses; never rewrite one into the other. It's a lint-autofix preference, not a convention, and flipping it repo-wide is pure churn.
 - `readonly` on props/params where immutability is intended.
 - Strict mode always (`strict: true`, `noExplicitAny` as an error).
 - JSDoc exported functions/services where the contract isn't obvious from the signature — never `@param`/`@returns` lines that restate what the types already say.

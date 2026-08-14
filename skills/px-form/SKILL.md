@@ -66,7 +66,7 @@ Buttons inside inputs: `InputGroup` + `InputGroupAddon`. Related checkboxes/radi
 ```ts
 const form = useForm<CheckoutFormValues>({
   defaultValues,
-  mode: 'onChange',
+  mode: 'onTouched', // onChange only when a field needs per-keystroke feedback
   resolver: zodResolver(checkoutSchema),
 });
 ```
